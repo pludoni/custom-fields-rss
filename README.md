@@ -50,3 +50,15 @@ Sie können auch Standardwerte hinterlegen. Dazu dient der „default“ Paramet
 Wenn Sie nur einen Standort haben können Sie diesen als Standardwert hinterlegen. 
 
 Die RSS-Feeds können dann im Empfehlungsbund importiert werden (http://www.empfehlungsbund.de/validator).
+
+## Unterscheidung Praktikantenstelle / Vollzeitstelle
+
+Empfehlungsbund.de erwartet einen getrennten Feed jeweils für Praktikanten/Lernende-Stellen und für Vollzeitstellen/Stellen für Fach und Führungskräfte. 
+
+Am leichtesten erreichen sie dies, durch Anlage von 2 getrennten Kategorien in denen sie die Blogbeiträge dann einsortieren.
+
+Die RSS-Feeds der Kategorien erreichen Sie meist so:
+
+www.example.com/?cat=5&feed=rss2
+
+Für den Parameter cat dann die id der entsprechenden Kategorie einsetzen.
