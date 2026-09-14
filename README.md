@@ -67,6 +67,27 @@ Der Empfehlungsbund erwartet getrennte Feeds für Praktikanten- und Ausbildungss
 Fach- und Führungskräfte andererseits. Legen Sie dafür einfach zwei Kategorien an und geben Sie deren
 Feed-Adressen an.
 
+So sieht eine Stelle im Feed aus – der obere Teil kommt aus dem Beitrag selbst, die `eb:`-Felder aus der
+Box darunter:
+
+```xml
+<item>
+  <title>Softwareentwickler Java für eCommerce-Lösungen (m/w/d)</title>
+  <link>https://www.example.com/jobs/java-entwickler/</link>
+  <pubDate>Mon, 03 Jan 2011 09:54:10 +0100</pubDate>
+  <description><![CDATA[<p>Vollständiger Stellentext …</p>]]></description>
+
+  <eb:nummer>post-42</eb:nummer>
+  <eb:ort>Dresden</eb:ort>
+  <eb:tags>Java, eCommerce, Software, IT</eb:tags>
+  <eb:bewerbungsweg>bewerbung@example.com</eb:bewerbungsweg>
+  <eb:kontakt-oeffentlich>Max Mustermann</eb:kontakt-oeffentlich>
+  <eb:art>fachkraft</eb:art>
+  <eb:homeoffice-art>hybrid</eb:homeoffice-art>
+  <eb:beruf>13659</eb:beruf>
+</item>
+```
+
 ## Woher ein Feldwert kommt
 
 Das ist die einzige Regel, die man kennen muss. Für jedes Feld gilt der Reihe nach:
@@ -162,73 +183,10 @@ funktioniert, muss `X-Frame-Options` entfernt und in der `Content-Security-Polic
 Portale hinterlegt werden. Die aktuelle Liste steht unten auf der
 [Validator-Seite](https://login.empfehlungsbund.de/validator).
 
-## Anpassung per Filter
+## Weiterentwicklung
 
-```php
-// Feldliste erweitern oder einschränken
-add_filter('custom_fields_rss_fields', function ($fields) {
-    $fields[] = 'mein-neues-feld';
-    return $fields;
-});
-
-// Feldaufbau samt Beschriftung und Typ verändern
-add_filter('custom_fields_rss_field_schema', function ($schema) {
-    $schema['gehalt']['global'] = true;
-    return $schema;
-});
-
-// Einzelnen Wert kurz vor der Ausgabe im Feed anpassen
-add_filter('custom_fields_rss_value', function ($value, $field, $post) {
-    return $field === 'tags' ? $value . ', Arbeitgeber des Jahres' : $value;
-}, 10, 3);
-
-// Beitragstypen überschreiben
-add_filter('custom_fields_rss_post_types', function ($types) {
-    return array('job');
-});
-```
-
----
-
-## Testinstanz mit Docker
-
-Zum Ausprobieren und Weiterentwickeln liegt ein fertiges WordPress-Setup bei. Es startet WordPress mit
-diesem Plugin, setzt Standardwerte und legt drei vollständige Beispiel-Stellenanzeigen in zwei Kategorien an:
-
-```bash
-cp .env.example .env      # Port und Adresse anpassen
-./bin/dev-setup.sh
-```
-
-Am Ende werden alle Adressen ausgegeben, unter anderem die beiden Kategorie-Feeds, die sich direkt in den
-Validator einfügen lassen. Ein erneuter Aufruf lässt eine bestehende Instanz unangetastet;
-`./bin/dev-setup.sh --reset` setzt sie komplett zurück – **inklusive Datenbank**.
-
-Die Zugangsdaten werden bei jeder Neuinstallation zufällig erzeugt und in `.dev-credentials` abgelegt
-(steht in `.gitignore`). Ein festes Passwort gibt es bewusst nicht: Eine öffentlich erreichbare
-WordPress-Instanz wird binnen Minuten von Bots gefunden. Zusätzlich sind `xmlrpc.php` und `wp-cron.php`
-gesperrt und die Instanz steht auf `noindex`.
-
-Das Plugin ist als Volume eingebunden – Codeänderungen wirken ohne Neustart.
-
-### Betrieb hinter einem Reverse Proxy
-
-WordPress richtet sich hier zur Laufzeit nach dem `Host`-Header, statt eine feste Adresse zu speichern.
-Dadurch ist dieselbe Instanz gleichzeitig über `http://localhost:8612` und über den Proxy erreichbar, ohne
-Redirect-Schleife. Der Proxy muss dafür den `Host`-Header durchreichen und bei TLS
-`X-Forwarded-Proto: https` setzen:
-
-```nginx
-location / {
-    proxy_pass http://127.0.0.1:8612;
-    proxy_set_header Host              $host;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-}
-```
-
-Diese Auswertung des `Host`-Headers gehört ausschließlich in die Testinstanz, nicht in eine produktive
-Installation.
+Wie man eine Testinstanz startet, das Plugin per Filter erweitert und wie der Code aufgebaut ist, steht
+in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ---
 
