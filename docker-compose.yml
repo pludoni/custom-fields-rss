@@ -1,0 +1,67 @@
+name: custom-fields-rss
+
+services:
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  wp:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${WP_PORT:-8612}:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: 1
+      # Home und Siteurl folgen dem Host-Header, damit derselbe Container direkt unter
+      # localhost:8612 und hinter dem Reverse Proxy ohne Redirect-Schleife erreichbar ist.
+      WORDPRESS_CONFIG_EXTRA: |
+        $$host  = isset($$_SERVER['HTTP_HOST']) ? $$_SERVER['HTTP_HOST'] : 'localhost:${WP_PORT:-8612}';
+        $$proto = (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ? 'https' : 'http';
+        if ($$proto === 'https') { $$_SERVER['HTTPS'] = 'on'; }
+        define('WP_HOME', $$proto . '://' . $$host);
+        define('WP_SITEURL', $$proto . '://' . $$host);
+        define('WP_DEBUG_DISPLAY', true);
+        define('SCRIPT_DEBUG', true);
+        define('DISALLOW_FILE_EDIT', true);
+    volumes:
+      - wp:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/custom-fields-rss
+      - ./docker/apache-hardening.conf:/etc/apache2/conf-enabled/zz-hardening.conf:ro
+
+  cli:
+    image: wordpress:cli-php8.3
+    user: "33:33"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/custom-fields-rss
+
+volumes:
+  db:
+  wp:
