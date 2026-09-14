@@ -1,39 +1,27 @@
 <?php
+/**
+ * Plugin Name: Empfehlungsbund Feederweiterung
+ * Plugin URI: https://login.empfehlungsbund.de/validator
+ * Description: Pflegt die Stellenanzeigen-Felder des Empfehlungsbundes am Beitrag und ergänzt damit den RSS-Feed um die eb:-Elemente. Standardwerte und Beitragstypen unter <a href="options-general.php?page=custom-fields-rss">Einstellungen &rarr; Empfehlungsbund</a>.
+ * Version: 2.1.0
+ * Requires at least: 5.0
+ * Requires PHP: 7.4
+ * Author: pludoni GmbH
+ * Author URI: https://www.pludoni.de
+ * License: GPL2
+ */
 
-  /**
-  * Plugin Name: Empfehlungsbund Feederweiterung
-  * Plugin URI: http://www.empfehlungsbund.de/validator
-  * Description: Fügt Custom-Fields zu einem RSS-Feed hinzu.
-  * Version: 1.0
-  * Author: pludoni GmbH
-  * Author URI: http://www.pludoni.de
-  * License: GPL2
-  */
+defined('ABSPATH') || exit;
 
-  class Extend_RSS_By_Custom_Fields {
-    function __construct() {
-      add_action('rss2_item', 'Extend_RSS_By_Custom_Fields::add_my_custom_field_node');
-      add_action('rss2_ns', 'Extend_RSS_By_Custom_Fields::add_ns');
-    }
-    function add_ns() {
-      echo 'xmlns:eb="http://www.empfehlungsbund.de/schema.dtd"';
-                }
-    function add_my_custom_field_node() {
-          global $post;
-          $custom_fields = get_post_custom();
+define('CUSTOM_FIELDS_RSS_VERSION', '2.1.0');
+define('CUSTOM_FIELDS_RSS_FILE', __FILE__);
 
-      foreach($custom_fields AS $key => $value) {
-        if(substr($key, 0, 1) != "_") {
-          foreach($value AS $_value) {
-            $_value = htmlspecialchars(trim($_value));
-            $key = strtolower($key);
-            if($_value) {
-              echo("<eb:$key>{$_value}</eb:$key>\r\n");
-            }
-          }
-        }
-      }
-    }
-  }
+foreach (array('fields', 'values', 'feed', 'field-renderer', 'metabox', 'settings', 'dkz', 'admin-assets') as $module) {
+    require_once __DIR__ . '/includes/class-eb-' . $module . '.php';
+}
 
-  $extended_rss = new Extend_RSS_By_Custom_Fields;
+EB_Feed::init();
+EB_Settings::init();
+EB_Metabox::init();
+EB_DKZ::init();
+EB_Admin_Assets::init();

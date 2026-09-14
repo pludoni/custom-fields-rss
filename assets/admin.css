@@ -1,0 +1,66 @@
+.eb-table .eb-key {
+    display: block;
+    margin-top: .2em;
+    font-size: 11px;
+    color: #787c82;
+    background: none;
+    padding: 0;
+}
+
+.eb-group {
+    margin: 1.4em 0 0;
+    padding-top: 1em;
+    border-top: 1px solid #dcdcde;
+}
+
+.eb-group:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.eb-media-preview img {
+    display: block;
+    max-width: 240px;
+    height: auto;
+    margin-top: .6em;
+    border: 1px solid #dcdcde;
+}
+
+.eb-beruf .spinner {
+    float: none;
+    margin: 0 0 0 .4em;
+    vertical-align: middle;
+}
+
+.eb-beruf-results {
+    max-width: 640px;
+    max-height: 260px;
+    margin-top: .6em;
+    overflow-y: auto;
+    border: 1px solid #dcdcde;
+    background: #fff;
+}
+
+.eb-beruf-hit {
+    display: block;
+    width: 100%;
+    padding: .4em .6em;
+    border: 0;
+    border-bottom: 1px solid #f0f0f1;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.eb-beruf-hit:hover,
+.eb-beruf-hit:focus {
+    background: #f0f6fc;
+}
+
+.eb-beruf-hit code {
+    display: inline-block;
+    min-width: 5.5em;
+    color: #787c82;
+    background: none;
+    padding: 0;
+}
