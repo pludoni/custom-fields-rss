@@ -1,153 +1,166 @@
-# custom-fields-rss – Empfehlungsbund Feederweiterung für WordPress
+# Empfehlungsbund Feederweiterung für WordPress
 
-Die Ausschreibung von Stellenanzeigen und deren Weiterverteilung in über 35 Meta-Jobbörsen erfolgt für
-Mitglieder des [Empfehlungsbundes](https://www.empfehlungsbund.de) über eine automatisierte Schnittstelle,
-die per XML-RSS-Feed angebunden wird. WordPress bringt einen RSS-Feed von Haus aus mit – ihm fehlen
-allerdings die stellenspezifischen Felder wie Ort, Schlagworte oder Bewerbungsweg.
+Stellenanzeigen aus WordPress an den [Empfehlungsbund](https://www.empfehlungsbund.de) übergeben – und von
+dort automatisch in über 35 angebundene Jobbörsen.
 
-Dieses Plugin ergänzt beides:
+Der Empfehlungsbund liest Stellen über einen RSS-Feed ein. Den bringt WordPress zwar mit, aber ohne die
+Angaben, die eine Stellenanzeige ausmachen: Arbeitsort, Bewerbungsweg, Gehalt, Homeoffice und so weiter.
+Genau diese Felder ergänzt das Plugin – zur Pflege im Backend und zur Ausgabe im Feed.
 
-* eine **Meta-Box am Beitrag** zur Pflege aller Felder – mit Auswahllisten, Bild-Upload aus der
-  Mediathek und einer Suche nach Berufen der Arbeitsagentur (DKZ),
-* **globale Standardwerte**, sodass pro Stelle nur noch das Abweichende einzutragen ist,
-* die Ausgabe als eigenständige XML-Elemente im Namensraum `eb:`
-  („Variante 2“ der [Feed-Spezifikation](https://login.empfehlungsbund.de/validator)).
+**Sie schreiben die Stellenanzeige wie einen normalen Beitrag. Das Plugin macht einen importierbaren Feed daraus.**
 
-Ergebnis im Feed:
+---
 
-```xml
-<rss version="2.0" xmlns:eb="http://www.empfehlungsbund.de/schema.dtd">
-  <channel>
-    <item>
-      <title>Softwareentwickler Java für eCommerce-Lösungen (m/w/d)</title>
-      <link>https://example.de/jobs/4711</link>
-      <pubDate>Mon, 03 Jan 2011 09:54:10 +0100</pubDate>
-      <description><![CDATA[<p>Vollständiger Stellentext …</p>]]></description>
-      <eb:nummer>job-4711</eb:nummer>
-      <eb:ort>Dresden</eb:ort>
-      <eb:tags>Java, eCommerce, Software, IT</eb:tags>
-      <eb:bewerbungsweg>jobs@example.de</eb:bewerbungsweg>
-      <eb:kontakt-oeffentlich>Max Mustermann</eb:kontakt-oeffentlich>
-      <eb:art>fachkraft</eb:art>
-      <eb:homeoffice-art>hybrid</eb:homeoffice-art>
-      <eb:beruf>13659</eb:beruf>
-    </item>
-  </channel>
-</rss>
-```
+## Was Sie damit machen können
 
-## Installation
+### Stellen-Felder direkt am Beitrag pflegen
 
-1. [ZIP herunterladen](https://github.com/pludoni/custom-fields-rss/archive/refs/heads/master.zip) und unter
-   `Plugins → Installieren → Plugin hochladen` einspielen, danach aktivieren.
-2. Unter `Einstellungen → Empfehlungsbund` die Beitragstypen wählen und die Standardwerte hinterlegen,
-   die für alle Stellen gelten (Ort, Ansprechpartner, Bewerbungsweg, Arbeitszeit …).
-3. Beitrag anlegen: Der Stellentext kommt in den Beitragsinhalt, die Zusatzfelder in die Meta-Box
-   **„Empfehlungsbund Stellenanzeige“** direkt darunter.
+Unter dem Beitragstext erscheint die Box „Empfehlungsbund Stellenanzeige“ mit allen Feldern der
+Feed-Spezifikation – sortiert nach Pflicht- und Zusatzangaben, jeweils mit Erklärung und Beispiel.
 
-Ein zusätzliches Plugin für benutzerdefinierte Felder wird nicht mehr benötigt.
+![Meta-Box an der Stellenanzeige](doc/meta-boxen-stellenansicht.png)
+
+### Einmal Standardwerte setzen, statt alles doppelt zu tippen
+
+Arbeitsort, Ansprechpartner, Bewerbungsweg, Urlaubstage – was für alle Stellen gleich ist, tragen Sie
+einmal unter `Einstellungen → Empfehlungsbund` ein. An der einzelnen Stelle füllen Sie dann nur noch aus,
+was davon abweicht.
+
+![Globale Standardwerte](doc/standardeinstellungen.png)
+
+### Den richtigen Beruf der Arbeitsagentur finden
+
+Für den Export an die Bundesagentur für Arbeit wird eine DKZ-Berufs-ID benötigt. Statt sie
+zusammenzusuchen, tippen Sie einen Suchbegriff ein und wählen aus der Liste aus. Ob in Ausbildungs- oder
+Tätigkeitsberufen gesucht wird, ergibt sich automatisch aus der gewählten Stellenart.
+
+![Berufssuche der Arbeitsagentur](doc/arbeitsagentur-completion.png)
+
+### Bilder aus der Mediathek verwenden
+
+Vorschau- und Bannerbild wählen Sie über die normale WordPress-Mediathek aus – hochladen, auswählen,
+fertig. Die öffentliche URL landet automatisch im Feed. Eine externe Bildadresse können Sie stattdessen
+auch direkt eintragen.
+
+---
+
+## Schnellstart
+
+1. **Plugin installieren.** [ZIP herunterladen](https://github.com/pludoni/custom-fields-rss/archive/refs/heads/master.zip),
+   unter `Plugins → Installieren → Plugin hochladen` einspielen und aktivieren.
+2. **Standardwerte setzen.** Unter `Einstellungen → Empfehlungsbund` die Beitragstypen wählen und
+   eintragen, was für alle Stellen gilt.
+3. **Stelle anlegen.** Stellentext in den Beitrag, Zusatzangaben in die Box darunter, veröffentlichen.
+4. **Feed prüfen.** Die Feed-Adresse (siehe unten) unter
+   [login.empfehlungsbund.de/validator](https://login.empfehlungsbund.de/validator) eingeben.
+
+Ein zusätzliches Plugin für benutzerdefinierte Felder wird nicht benötigt.
+
+## Ihre Feed-Adressen
+
+| Inhalt | Adresse |
+| --- | --- |
+| Alle Beiträge | `https://www.example.com/feed/` |
+| Eine Kategorie | `https://www.example.com/category/IHRE-KATEGORIE/feed/` |
+
+Der Empfehlungsbund erwartet getrennte Feeds für Praktikanten- und Ausbildungsstellen einerseits und für
+Fach- und Führungskräfte andererseits. Legen Sie dafür einfach zwei Kategorien an und geben Sie deren
+Feed-Adressen an.
 
 ## Woher ein Feldwert kommt
 
-Für jedes Feld gilt in dieser Reihenfolge:
+Das ist die einzige Regel, die man kennen muss. Für jedes Feld gilt der Reihe nach:
 
-1. der Wert **an der Stellenanzeige** – falls leer:
-2. der **globale Standardwert** aus `Einstellungen → Empfehlungsbund` – falls leer:
-3. ein **automatischer Fallback**, sofern es für das Feld einen gibt.
+1. **Der Wert an der Stellenanzeige.** Ist er leer, dann:
+2. **Der globale Standardwert** aus den Einstellungen. Ist auch der leer, dann:
+3. **Ein automatischer Wert**, falls es für das Feld einen gibt.
 
-Der Platzhalter im Eingabefeld zeigt jeweils an, was im Feed landet, wenn das Feld leer bleibt.
+Der graue Platzhalter im Eingabefeld zeigt jeweils, was passiert, wenn Sie es leer lassen.
 
-Automatische Fallbacks gibt es für:
+Automatisch ergänzt werden:
 
-| Feld | Fallback |
+| Feld | Automatischer Wert |
 | --- | --- |
-| `nummer` | Die Beitrags-ID (`post-42`). |
-| `link` | Der Permalink des Beitrags. |
-| `og-image` | Das Beitragsbild, falls gesetzt. |
+| Nummer / GUID | Die Beitrags-ID, z. B. `post-42` |
+| Link zur Stelle | Der Permalink des Beitrags |
+| Social-Media-Bild | Das Beitragsbild, falls gesetzt |
 
-### Stellennummer / GUID
+**Ein Feld gezielt weglassen:** Tragen Sie ein einzelnes `-` ein. Dann wird weder der Standardwert noch
+der automatische Wert verwendet, und das Feld fehlt im Feed. Praktisch etwa bei einer Schichtstelle, für
+die „Homeoffice: hybrid“ aus den Standardwerten nicht passt.
 
-Die GUID steuert, wie der Importer eine Stelle behandelt: Eine bereits bekannte GUID wird ignoriert,
-eine neue GUID erzeugt eine neue Anzeige mit eigener Zugriffsstatistik. In den Einstellungen legen Sie
-fest, was bei automatisch vergebenen Nummern passieren soll:
+### Zur Stellennummer
 
-* **Gleich bleibend je Beitrag** (Standard) – eine Stelle bleibt im Portal dieselbe Anzeige.
+Die Nummer entscheidet, wie der Empfehlungsbund eine Stelle behandelt: Eine bereits bekannte Nummer wird
+beim Import übersprungen, eine neue Nummer erzeugt eine neue Anzeige mit eigener Zugriffsstatistik. In den
+Einstellungen legen Sie fest, was bei automatisch vergebenen Nummern gelten soll:
+
+* **Gleich bleibend je Beitrag** – eine Stelle bleibt im Portal dieselbe Anzeige.
 * **Neu bei jeder Änderung** – jede Überarbeitung wird als neue Anzeige geführt und separat ausgewertet.
 
-Wer die Nummern selbst vergibt, trägt sie einfach ins Feld ein; die Einstellung greift dann nicht.
+Wer die Nummern selbst vergibt, trägt sie ins Feld ein; die Einstellung greift dann nicht.
 
-## Besondere Felder
-
-**Bilder (`og-image`, `header-image`).** Über „Bild auswählen“ öffnet sich die WordPress-Mediathek.
-Dort hochgeladene Bilder liegen wie jede andere Mediendatei unter `wp-content/uploads/` und sind
-öffentlich erreichbar – ihre URL wird in den Feed geschrieben. Alternativ lässt sich eine externe URL
-direkt eintragen.
-
-**Beruf (`beruf`).** Das Suchfeld fragt die DKZ-Berufsliste der Bundesagentur für Arbeit ab und schreibt
-die gewählte ID ins Feld. Die Unterscheidung zwischen Ausbildungs- und Tätigkeitsberufen erfolgt
-automatisch anhand der gewählten Stellenart – bei `ausbildung` und `duales_studium` wird in den
-Ausbildungsberufen gesucht, sonst in den Tätigkeitsberufen. Ergebnisse werden 12 Stunden zwischengespeichert.
+---
 
 ## Feldreferenz
 
 Maßgeblich ist immer die [Feed-Spezifikation im Validator](https://login.empfehlungsbund.de/validator).
+Im Feed erscheinen die Felder mit dem Präfix `eb:`, also z. B. `<eb:ort>`.
 
 ### Pflichtangaben
 
 | Feld | Bedeutung |
 | --- | --- |
-| `title` | Aussagekräftiger Titel mit Position, Kernkompetenz und Domäne. Nicht „Softwareentwickler (m/w/d)“, sondern „Softwareentwickler Java für eCommerce-Lösungen (m/w/d)“. |
-| `link` | Ziel der Stellenanzeige. HTML ist PDF vorzuziehen – HTML-Seiten werden auf der Jobdetailseite als iFrame eingebettet. |
-| `pubDate` | Veröffentlichungsdatum im RFC-822-Format. Liefert WordPress automatisch. |
-| `description` | Vollständiger Stellentext. Einige Jobbörsen importieren erst ab ca. 1.000 Zeichen. Erlaubte HTML-Tags: `p, q, strong, em, li, ol, ul`. |
-| `nummer` | Eindeutige GUID pro Stelle, siehe oben. |
+| Titel | Position, wichtigste Fachkompetenz und Anwendungsdomäne. Nicht „Softwareentwickler (m/w/d)“, sondern „Softwareentwickler Java für eCommerce-Lösungen (m/w/d)“. |
+| Beitragstext | Der vollständige Stellentext. Einige Jobbörsen importieren erst ab etwa 1.000 Zeichen. Erlaubt sind die Formatierungen `p, q, strong, em, li, ol, ul`. |
+| Veröffentlichungsdatum | Liefert WordPress automatisch. |
+| `nummer` | Eindeutig pro Stelle, siehe oben. |
 | `ort` | Arbeitsort. Stellen ohne Ort aus der Region werden nicht importiert. |
-| `tags` | Ca. 4 kommagetrennte Schlagworte, die wichtigsten zuerst. **Genau eines** aus `IT` (Softwareentwicklung), `MINT` (Maschinenbau, Mechatronik, Elektrotechnik, Physik, Chemie, Technik), `OFFICE` (kaufmännisch/Verwaltung) oder `SANO` (Gesundheits- und Sozialwesen) steuert das Zielportal. |
-| `bewerbungsweg` + `kontakt-oeffentlich` | Bewerbungsweg: genau eine E-Mail-Adresse oder ein https-Link zum Bewerbermanagementsystem. Kontakt-oeffentlich: öffentlich angezeigte Ansprechpartner (kommagetrennt); deren E-Mail sollte mit der im Empfehlungsbund-Profil hinterlegten übereinstimmen. Beide Felder nur gemeinsam verwenden. |
-| `kontakt` | **Veraltet.** Nur nötig, wenn `bewerbungsweg`/`kontakt-oeffentlich` nicht verwendet werden. Das Feld erscheint in der Meta-Box nur, solange ein Wert hinterlegt ist. |
+| `tags` | Etwa 4 Schlagworte, kommagetrennt, die wichtigsten zuerst. **Genau eines** davon steuert das Zielportal: `IT` (Softwareentwicklung), `MINT` (Maschinenbau, Mechatronik, Elektrotechnik, Physik, Chemie, Technik), `OFFICE` (kaufmännisch und Verwaltung) oder `SANO` (Gesundheits- und Sozialwesen). |
+| `bewerbungsweg` | Genau eine E-Mail-Adresse oder ein https-Link zum Bewerbermanagementsystem. |
+| `kontakt-oeffentlich` | Öffentlich angezeigte Ansprechpartner, kommagetrennt. Deren E-Mail sollte mit der im Empfehlungsbund-Profil hinterlegten übereinstimmen. Nur gemeinsam mit `bewerbungsweg` verwenden. |
+| `kontakt` | **Veraltet**, nur nötig ohne `bewerbungsweg`/`kontakt-oeffentlich`. Erscheint in der Box nur, solange ein Wert hinterlegt ist. |
 
-### Optionale Angaben
+### Zusatzangaben
 
 | Feld | Werte / Beispiel |
 | --- | --- |
-| `strasse-nr`, `plz`, `bundesland` | Nur nötig bei mehreren Standorten in einer Stadt oder wenn viele Orte dynamisch angelegt werden sollen. Sonst reicht `ort`. |
-| `einrichtung` | Einrichtung/Unterprofil – muss im Empfehlungsbund-Profil existieren. |
-| `gehalt` | `30.000 EUR`, `30000`, `30.000 EUR - 50.000 EUR pro Jahr`, `3.000-4.000 pro monat`, `15 EUR / h`. Ohne Zeiteinheit gilt Jahresgehalt. |
-| `arbeitszeit` | `[ART] [VON]-[BIS]` mit Art `fest`, `flexibel`, `schicht` – z. B. `fest 40h`, `flexibel 32-40h`. |
-| `urlaub` | `30`, `30 Tage`, `21-30 Tage` |
 | `art` | `fachkraft`, `fuehrungskraft`, `freelancer`, `hilfskraft`, `praktikum`, `werkstudent`, `volunteer`, `ausbildung`, `weiterbildung`, `duales_studium` |
 | `homeoffice-art` | `hybrid` (teilweise), `full` (deutschlandweit remote), `full (DE,AT,UK)` (mit erlaubten Wohnorten) |
-| `levels` | `junior`, `intermediate`, `senior`, `ungelernt`, `quereinstieg` – mehrere kommagetrennt |
-| `sprachen` | Sprache oder ISO-Code + CEFRL-Level, max. 3: `Deutsch C2, Englisch B2`, `de (B2)` |
-| `schwerbehinderung` | `geeignet` (auch für Schwerbehinderte) oder `exklusiv` (nur Schwerbehinderte). Ohne Angabe: keine Spezifikation. |
-| `beruf` | DKZ-Berufs-ID der Arbeitsagentur (z. B. `13659` für Fachinformatiker Anwendungsentwicklung). |
-| `og-image` | Vorschaubild für Social Media. JPEG/GIF/PNG, empfohlen 1080px Breite, mind. 600px. |
-| `header-image` | Bannerbild in den Community-Portalen. JPEG/GIF/PNG, empfohlen 1100px Breite. |
-| `relocation` | `ZIELGRUPPE: FREITEXT` mit Zielgruppe `international` oder `eu` – z. B. `international: We help you with the Blue Card and pay the flight!` |
+| `levels` | `junior`, `intermediate`, `senior`, `ungelernt`, `quereinstieg` – Mehrfachauswahl möglich |
+| `gehalt` | `30.000 EUR`, `30.000 EUR - 50.000 EUR pro Jahr`, `3.000-4.000 pro monat`, `15 EUR / h`. Ohne Zeiteinheit gilt ein Jahresgehalt. |
+| `arbeitszeit` | `[ART] [VON]-[BIS]` mit `fest`, `flexibel` oder `schicht` – z. B. `fest 40h`, `flexibel 32-40h` |
+| `urlaub` | `30`, `30 Tage`, `21-30 Tage` |
+| `sprachen` | Sprache oder ISO-Code mit CEFRL-Level, maximal 3: `Deutsch C2, Englisch B2`, `de (B2)` |
+| `beruf` | DKZ-Berufs-ID der Arbeitsagentur, per Suche im Feld auswählbar |
+| `schwerbehinderung` | `geeignet` (auch für Schwerbehinderte) oder `exklusiv` (nur Schwerbehinderte) |
+| `relocation` | `ZIELGRUPPE: FREITEXT` mit `international` oder `eu` – z. B. `international: We help you with the Blue Card and pay the flight!` |
+| `og-image` | Vorschaubild für Social Media. JPEG, GIF oder PNG, empfohlen 1080px Breite, mindestens 600px. |
+| `header-image` | Bannerbild in den Community-Portalen. JPEG, GIF oder PNG, empfohlen 1100px Breite. |
+| `einrichtung` | Einrichtung oder Unterprofil – muss im Empfehlungsbund-Profil existieren. |
+| `strasse-nr`, `plz`, `bundesland` | Nur nötig bei mehreren Standorten in einer Stadt oder wenn viele Orte dynamisch angelegt werden sollen. Sonst genügt `ort`. |
 
-## Feed-URLs
-
-Der Standard-Feed liegt unter `https://www.example.com/?feed=rss2`. Sollen Praktikanten-/Lernenden-Stellen
-und Stellen für Fach- und Führungskräfte getrennt übergeben werden, legen Sie dafür zwei Kategorien an;
-deren Feeds erreichen Sie mit der jeweiligen Kategorie-ID:
-
-```
-https://www.example.com/?cat=5&feed=rss2
-```
-
-Diese Feed-URLs anschließend unter <https://login.empfehlungsbund.de/validator> prüfen und importieren lassen.
+---
 
 ## Umstieg von Version 1.x
 
 Version 1.x wurde zusammen mit dem Plugin
-[Custom Field Template](https://wordpress.org/plugins/custom-field-template/) eingesetzt. Bestehende Werte
-bleiben erhalten: Die Meta-Box liest dieselben Meta-Schlüssel, Groß-/Kleinschreibung ist egal und
-Unterstriche werden auf Bindestriche normalisiert (`Homeoffice_Art` → `eb:homeoffice-art`). Beim Speichern
-eines Beitrags werden abweichende Schreibweisen desselben Feldes zusammengeführt, damit ein Feld nicht
+[Custom Field Template](https://wordpress.org/plugins/custom-field-template/) eingesetzt. **Bestehende Werte
+bleiben erhalten** – die Box liest dieselben Felder. Groß- und Kleinschreibung spielt keine Rolle,
+Unterstriche werden wie Bindestriche behandelt (`Homeoffice_Art` und `homeoffice-art` sind dasselbe Feld).
+Beim Speichern eines Beitrags werden abweichende Schreibweisen zusammengeführt, damit ein Feld nicht
 doppelt im Feed landet.
 
-Custom Field Template kann nach dem Update deaktiviert werden. Die dort gepflegten `default`-Werte
-entsprechen den Standardwerten unter `Einstellungen → Empfehlungsbund`.
+Custom Field Template kann danach deaktiviert werden. Die dort gepflegten `default`-Werte entsprechen den
+Standardwerten unter `Einstellungen → Empfehlungsbund`.
+
+## Stellenseiten einbettbar machen
+
+Unter den Stellenanzeigen in den Community-Portalen wird Ihre eigene Stellenseite als iFrame eingebettet.
+Viele Webserver unterbinden das per `X-Frame-Options` oder `Content-Security-Policy`. Damit die Einbettung
+funktioniert, muss `X-Frame-Options` entfernt und in der `Content-Security-Policy` eine Whitelist der
+Portale hinterlegt werden. Die aktuelle Liste steht unten auf der
+[Validator-Seite](https://login.empfehlungsbund.de/validator).
 
 ## Anpassung per Filter
 
@@ -158,7 +171,7 @@ add_filter('custom_fields_rss_fields', function ($fields) {
     return $fields;
 });
 
-// Kompletten Feldaufbau samt Beschriftung und Typ verändern
+// Feldaufbau samt Beschriftung und Typ verändern
 add_filter('custom_fields_rss_field_schema', function ($schema) {
     $schema['gehalt']['global'] = true;
     return $schema;
@@ -175,32 +188,70 @@ add_filter('custom_fields_rss_post_types', function ($types) {
 });
 ```
 
-## Einbettung als iFrame ermöglichen
+---
 
-Unter den Stellenanzeigen in den Community-Portalen wird Ihre eigene Stellenseite als iFrame eingebettet.
-Viele Webserver und CMS unterbinden das per `X-Frame-Options` bzw. `Content-Security-Policy`. Damit die
-Einbettung funktioniert, muss `X-Frame-Options` entfernt werden und in der `Content-Security-Policy` eine
-Whitelist der Portale hinterlegt sein – die aktuelle Liste finden Sie unten auf der
-[Validator-Seite](https://login.empfehlungsbund.de/validator).
+## Testinstanz mit Docker
+
+Zum Ausprobieren und Weiterentwickeln liegt ein fertiges WordPress-Setup bei. Es startet WordPress mit
+diesem Plugin, setzt Standardwerte und legt drei vollständige Beispiel-Stellenanzeigen in zwei Kategorien an:
+
+```bash
+cp .env.example .env      # Port und Adresse anpassen
+./bin/dev-setup.sh
+```
+
+Am Ende werden alle Adressen ausgegeben, unter anderem die beiden Kategorie-Feeds, die sich direkt in den
+Validator einfügen lassen. Ein erneuter Aufruf lässt eine bestehende Instanz unangetastet;
+`./bin/dev-setup.sh --reset` setzt sie komplett zurück – **inklusive Datenbank**.
+
+Die Zugangsdaten werden bei jeder Neuinstallation zufällig erzeugt und in `.dev-credentials` abgelegt
+(steht in `.gitignore`). Ein festes Passwort gibt es bewusst nicht: Eine öffentlich erreichbare
+WordPress-Instanz wird binnen Minuten von Bots gefunden. Zusätzlich sind `xmlrpc.php` und `wp-cron.php`
+gesperrt und die Instanz steht auf `noindex`.
+
+Das Plugin ist als Volume eingebunden – Codeänderungen wirken ohne Neustart.
+
+### Betrieb hinter einem Reverse Proxy
+
+WordPress richtet sich hier zur Laufzeit nach dem `Host`-Header, statt eine feste Adresse zu speichern.
+Dadurch ist dieselbe Instanz gleichzeitig über `http://localhost:8612` und über den Proxy erreichbar, ohne
+Redirect-Schleife. Der Proxy muss dafür den `Host`-Header durchreichen und bei TLS
+`X-Forwarded-Proto: https` setzen:
+
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:8612;
+    proxy_set_header Host              $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+}
+```
+
+Diese Auswertung des `Host`-Headers gehört ausschließlich in die Testinstanz, nicht in eine produktive
+Installation.
+
+---
 
 ## Kompatibilität
 
-Getestet mit WordPress 6.x/7.x und PHP 7.4 bis 8.3, im Block- wie im klassischen Editor.
+WordPress 6.x und 7.x, PHP 7.4 bis 8.3, Block- wie klassischer Editor.
 
 ## Changelog
 
 **2.1.0**
 
-* Meta-Box „Empfehlungsbund Stellenanzeige“ am Beitrag – kein zusätzliches Feld-Plugin mehr nötig.
-* Globale Standardwerte und Einstellungsseite unter `Einstellungen → Empfehlungsbund`.
-* Automatische Fallbacks für Nummer, Link und Social-Media-Bild.
-* Bildfelder mit Mediathek-Anbindung, Berufsfeld mit DKZ-Suche.
+* Box „Empfehlungsbund Stellenanzeige“ am Beitrag – kein zusätzliches Feld-Plugin mehr nötig.
+* Globale Standardwerte unter `Einstellungen → Empfehlungsbund`.
+* Automatische Werte für Nummer, Link und Social-Media-Bild.
+* Bildfelder mit Mediathek-Anbindung, Berufsfeld mit Suche in der DKZ der Arbeitsagentur.
+* Ein einzelnes `-` in einem Feld unterdrückt Standardwert und automatischen Wert.
 * Filter `custom_fields_rss_field_schema`, `custom_fields_rss_value` und `custom_fields_rss_post_types`.
+* Testinstanz per Docker Compose inklusive Beispiel-Stellenanzeigen.
 
 **2.0.0**
 
-* Fatal Error unter PHP 8 behoben – der Feed brach dort komplett ab (Callbacks waren nicht `static`).
-* Nur noch die dokumentierten Empfehlungsbund-Felder werden ausgegeben; interne Meta-Daten anderer Plugins
+* Fatal Error unter PHP 8 behoben – der Feed brach dort komplett ab.
+* Nur noch die dokumentierten Empfehlungsbund-Felder werden ausgegeben; interne Daten anderer Plugins
   landen nicht mehr im öffentlichen Feed und erzeugen kein ungültiges XML mehr.
 * Filter `custom_fields_rss_fields` zum Erweitern der Feldliste.
 * Feldnamen werden normalisiert (`Homeoffice_Art` → `eb:homeoffice-art`).
@@ -211,4 +262,4 @@ Getestet mit WordPress 6.x/7.x und PHP 7.4 bis 8.3, im Block- wie im klassischen
 
 ## Lizenz
 
-GPL-2.0, pludoni GmbH
+GPL-2.0 · [pludoni GmbH](https://www.pludoni.de)
