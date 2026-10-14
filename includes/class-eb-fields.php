@@ -51,7 +51,7 @@ class EB_Fields {
                 'group'       => 'pflicht',
                 'global'      => false,
                 'placeholder' => 'Permalink des Beitrags',
-                'help'        => 'Nur ausfüllen, wenn die Stelle woanders liegt als dieser Beitrag.',
+                'help'        => 'Nur ausfüllen, wenn die Stellenanzeige woanders liegt als dieser Beitrag. Nicht den Bewerbungslink eintragen, der gehört in „Bewerbungsweg“.',
             ),
 
             'art' => array(

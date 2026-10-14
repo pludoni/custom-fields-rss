@@ -80,7 +80,9 @@ wp option update custom_fields_rss_options --format=json <<'JSON'
     "bundesland": "Sachsen"
   },
   "nummer_strategy": "stable",
-  "post_types": ["post"]
+  "post_types": ["post"],
+  "bms_username": "pludoni",
+  "apply_button": true
 }
 JSON
 

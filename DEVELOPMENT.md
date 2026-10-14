@@ -67,6 +67,7 @@ Einstellungsseite und Feed lesen alle aus demselben Schema. Ein neues Feld ergä
 | `class-eb-settings.php` | Einstellungsseite und globale Standardwerte |
 | `class-eb-field-renderer.php` | Rendert ein einzelnes Feld, identisch in Meta-Box und Einstellungen |
 | `class-eb-dkz.php` | REST-Route für die Berufssuche der Arbeitsagentur |
+| `class-eb-apply.php` | Bewerben-Link ins EBMS: Shortcodes und automatischer Button |
 | `class-eb-admin-assets.php` | Lädt `assets/admin.js` und `assets/admin.css` im Backend |
 
 ### Berufssuche
@@ -99,6 +100,11 @@ add_filter('custom_fields_rss_field_schema', function ($schema) {
 add_filter('custom_fields_rss_value', function ($value, $field, $post) {
     return $field === 'tags' ? $value . ', Arbeitgeber des Jahres' : $value;
 }, 10, 3);
+
+// Bewerben-Link anpassen, z. B. ein bestimmtes Bewerbungs-Widget vorwählen
+add_filter('custom_fields_rss_apply_url', function ($url, $post) {
+    return add_query_arg('job_widget_id', 123, $url);
+}, 10, 2);
 
 // Beitragstypen überschreiben
 add_filter('custom_fields_rss_post_types', function ($types) {

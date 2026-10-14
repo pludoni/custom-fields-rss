@@ -15,9 +15,12 @@ class EB_Settings {
 
     public static function options() {
         $defaults = array(
-            'defaults'        => array(),
-            'nummer_strategy' => 'stable',
-            'post_types'      => array('post'),
+            'defaults'          => array(),
+            'nummer_strategy'   => 'stable',
+            'post_types'        => array('post'),
+            'bms_username'      => '',
+            'apply_button'      => false,
+            'apply_button_text' => '',
         );
         return wp_parse_args((array) get_option(self::OPTION, array()), $defaults);
     }
@@ -58,11 +61,15 @@ class EB_Settings {
 
     public static function sanitize($input) {
         $clean = array(
-            'defaults'        => array(),
-            'nummer_strategy' => in_array(isset($input['nummer_strategy']) ? $input['nummer_strategy'] : '', array('stable', 'modified'), true)
+            'defaults'          => array(),
+            'nummer_strategy'   => in_array(isset($input['nummer_strategy']) ? $input['nummer_strategy'] : '', array('stable', 'modified'), true)
                 ? $input['nummer_strategy']
                 : 'stable',
-            'post_types'      => array(),
+            'post_types'        => array(),
+            // Entspricht der Routen-Einschränkung im EBMS.
+            'bms_username'      => preg_replace('/[^a-z0-9._-]/', '', strtolower(trim(isset($input['bms_username']) ? (string) $input['bms_username'] : ''))),
+            'apply_button'      => !empty($input['apply_button']),
+            'apply_button_text' => sanitize_text_field(isset($input['apply_button_text']) ? $input['apply_button_text'] : ''),
         );
 
         $schema = EB_Fields::all();
@@ -131,6 +138,52 @@ class EB_Settings {
                         Neu bei jeder Änderung – jede Überarbeitung wird als neue Anzeige mit eigener Statistik geführt.
                     </label>
                 </fieldset>
+
+                <h2>Bewerben-Button</h2>
+                <p class="description">
+                    Verlinkt jede Stelle direkt auf ihr Bewerbungsformular im Empfehlungsbund-Bewerbermanagement (EBMS).
+                    Das EBMS erkennt die Stelle an ihrer Nummer. Neue Stellen sind dort erst nach dem nächsten Feed-Import
+                    vorhanden, bis dahin führt der Link zur Initiativbewerbung.
+                </p>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><label for="eb-bms-username">EBMS-Username</label></th>
+                        <td>
+                            <input type="text" class="regular-text" id="eb-bms-username"
+                                   name="<?php echo esc_attr(self::OPTION); ?>[bms_username]"
+                                   value="<?php echo esc_attr($options['bms_username']); ?>"
+                                   placeholder="firmenname">
+                            <p class="description">Ihr Username im Empfehlungsbund. Ohne Username wird kein Link ausgegeben.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Automatisch anzeigen</th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="<?php echo esc_attr(self::OPTION); ?>[apply_button]" value="1"
+                                       <?php checked($options['apply_button']); ?>>
+                                Bewerben-Button unter dem Stellentext anzeigen
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="eb-apply-button-text">Button-Text</label></th>
+                        <td>
+                            <input type="text" class="regular-text" id="eb-apply-button-text"
+                                   name="<?php echo esc_attr(self::OPTION); ?>[apply_button_text]"
+                                   value="<?php echo esc_attr($options['apply_button_text']); ?>"
+                                   placeholder="Jetzt bewerben">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Shortcodes</th>
+                        <td>
+                            <p><code>[eb_bewerben_button text="Jetzt bewerben"]</code> – fertiger Link mit der CSS-Klasse <code>eb-bewerben-button</code>.</p>
+                            <p><code>[eb_bewerben_url]</code> – nur die Adresse, z.&nbsp;B. für den Link eines Buttons im Page-Builder
+                                (Elementor: Link → Dynamische Tags → „Shortcode“).</p>
+                        </td>
+                    </tr>
+                </table>
 
                 <h2>Standardwerte</h2>
                 <table class="form-table" role="presentation">

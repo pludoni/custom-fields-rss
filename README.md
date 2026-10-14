@@ -175,6 +175,41 @@ doppelt im Feed landet.
 Custom Field Template kann danach deaktiviert werden. Die dort gepflegten `default`-Werte entsprechen den
 Standardwerten unter `Einstellungen → Empfehlungsbund`.
 
+## Bewerben-Button
+
+Nutzen Sie das Bewerbermanagement des Empfehlungsbundes (EBMS), kann das Plugin jede Stelle direkt mit
+ihrem Bewerbungsformular verlinken. Tragen Sie dazu unter `Einstellungen → Empfehlungsbund` Ihren
+EBMS-Username ein. Der Link hat für alle Stellen dasselbe Muster, das EBMS erkennt die Stelle an ihrer
+Nummer:
+
+```
+https://bms.empfehlungsbund.de/bewerbungen/start/<USERNAME>/<NUMMER>
+```
+
+Für die Ausgabe gibt es drei Wege:
+
+| Weg | Wofür |
+| --- | --- |
+| Häkchen „Bewerben-Button unter dem Stellentext anzeigen“ | Ohne weiteres Zutun, für Themes ohne eigenes Stellen-Template. |
+| `[eb_bewerben_button text="Jetzt bewerben"]` | Fertiger Link an beliebiger Stelle: Block „Shortcode“, klassischer Editor, Divi, WPBakery … |
+| `[eb_bewerben_url]` | Nur die Adresse, für den Link eines Buttons im Page-Builder. |
+
+Der Button bringt kein eigenes Design mit, sondern nur die CSS-Klasse `eb-bewerben-button`, damit er das
+Aussehen des Themes übernimmt.
+
+**Elementor:** Im Template für die Stellenanzeigen den Button anklicken, beim Feld „Link“ auf das Symbol für
+dynamische Tags klicken, „Shortcode“ wählen und `[eb_bewerben_url]` eintragen. Die Shortcodes beziehen sich
+immer auf die Stelle, die gerade angezeigt wird, und funktionieren deshalb auch in Übersichtslisten.
+
+Wichtig:
+
+* Das Feld „Link zur Stelle“ ist **nicht** für den Bewerbungslink gedacht und bleibt normalerweise leer.
+  Der Empfehlungsbund zeigt die dort hinterlegte Seite als Stellenanzeige an.
+* Neue Stellen kennt das EBMS erst nach dem nächsten Feed-Import. Bis dahin führt der Link zur
+  Initiativbewerbung.
+* Mit der Einstellung „Neu bei jeder Änderung“ ändert sich die Nummer nach jeder Bearbeitung. Bis zum
+  nächsten Import findet das EBMS die Stelle dann nicht. „Gleich bleibend je Beitrag“ ist hier die bessere Wahl.
+
 ## Stellenseiten einbettbar machen
 
 Unter den Stellenanzeigen in den Community-Portalen wird Ihre eigene Stellenseite als iFrame eingebettet.
@@ -195,6 +230,11 @@ in [DEVELOPMENT.md](DEVELOPMENT.md).
 WordPress 6.x und 7.x, PHP 7.4 bis 8.3, Block- wie klassischer Editor.
 
 ## Changelog
+
+**2.2.0**
+
+* Bewerben-Link ins EBMS: Shortcodes `[eb_bewerben_url]` und `[eb_bewerben_button]` sowie optional ein
+  automatischer Button unter dem Stellentext.
 
 **2.1.0**
 
