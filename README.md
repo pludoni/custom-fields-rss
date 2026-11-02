@@ -108,6 +108,9 @@ Die Felder, die bei Ihren Stellen vorkommen, werden darunter angezeigt. Das Plug
 Reihenfolge an den Stellentext im Feed an, in `<description>` und `<content:encoded>`. An der Pflege der
 Stellen ändert sich nichts.
 
+Den Satz „The post … appeared first on …“, den Yoast SEO an jeden Feed-Eintrag hängt, entfernt das Plugin
+bei den Stellen automatisch. Andere Feeds Ihrer Seite behalten ihn.
+
 ## Woher ein Feldwert kommt
 
 Das ist die einzige Regel, die man kennen muss. Für jedes Feld gilt der Reihe nach:
@@ -250,6 +253,10 @@ in [DEVELOPMENT.md](DEVELOPMENT.md).
 WordPress 6.x und 7.x, PHP 7.4 bis 8.3, Block- wie klassischer Editor.
 
 ## Changelog
+
+**2.3.1**
+
+* Der Satz „The post … appeared first on …“ von Yoast SEO entfällt im Feed der Stellen-Beitragstypen.
 
 **2.3.0**
 

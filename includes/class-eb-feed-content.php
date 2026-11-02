@@ -9,9 +9,15 @@ defined('ABSPATH') || exit;
 class EB_Feed_Content {
 
     public static function init() {
-        // Vor Yoast (Priorität 10), damit dessen "appeared first on" hinter dem Stellentext bleibt.
         add_filter('the_content_feed', array(__CLASS__, 'content'), 5);
         add_filter('the_excerpt_rss', array(__CLASS__, 'description'), 5);
+        add_filter('wpseo_include_rss_footer', array(__CLASS__, 'yoast_footer'));
+    }
+
+    /** Yoasts "The post … appeared first on …" landete sonst beim Empfehlungsbund im importierten Stellentext. */
+    public static function yoast_footer($show) {
+        $post = get_post();
+        return $post && in_array($post->post_type, EB_Fields::post_types(), true) ? false : $show;
     }
 
     public static function content($content) {
