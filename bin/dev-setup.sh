@@ -36,9 +36,22 @@ for _ in $(seq 1 60); do
     sleep 2
 done
 
+# Nachbau von Kundenseiten wie ibh.de, deren Stellentext nicht im Beitragsinhalt steht. Läuft auch auf
+# bestehenden Instanzen und legt die Stellen nur einmal an. Elementor Pro (Theme Builder) ist nicht frei
+# verfügbar, die mu-plugins in docker/ ersetzen dessen Vorlage.
+setup_pagebuilder() {
+    echo "==> Page-Builder-Szenario: Hello Elementor, Elementor, ACF, Yoast SEO"
+    wp theme install hello-elementor --activate >/dev/null
+    wp plugin install elementor advanced-custom-fields wordpress-seo --activate >/dev/null
+    wp eval-file wp-content/plugins/custom-fields-rss/docker/seed-pagebuilder.php
+}
+
 if wp core is-installed 2>/dev/null; then
     echo "==> WordPress ist bereits installiert, Beispieldaten werden übersprungen"
     wp plugin activate custom-fields-rss >/dev/null
+    setup_pagebuilder
+    echo
+    echo "    Stellen-Feed:  ${WP_URL}/feed/?post_type=jobs"
     echo
     echo "    Adresse:       ${WP_URL}"
     echo "    Zugangsdaten:  ${CREDENTIALS_FILE}"
@@ -133,6 +146,8 @@ seed_post "Ausbildung zum Fachinformatiker Anwendungsentwicklung (m/w/d)" "${AUS
     gehalt "1.100 EUR pro monat" \
     beruf "13659"
 
+setup_pagebuilder
+
 cat > "${CREDENTIALS_FILE}" <<EOF
 # Zugangsdaten der Testinstanz - steht in .gitignore, nicht einchecken.
 # Wird bei "bin/dev-setup.sh --reset" neu erzeugt.
@@ -151,5 +166,6 @@ echo
 echo "    Feed gesamt:       ${WP_URL}/feed/"
 echo "    Fach-/Führung:     ${WP_URL}/category/fachkraefte/feed/"
 echo "    Ausbildung:        ${WP_URL}/category/ausbildung/feed/"
+echo "    Stellen (Page-Builder): ${WP_URL}/feed/?post_type=jobs"
 echo
 echo "    Validator:    https://login.empfehlungsbund.de/validator"

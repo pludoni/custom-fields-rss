@@ -45,6 +45,7 @@ services:
     volumes:
       - wp:/var/www/html
       - ./:/var/www/html/wp-content/plugins/custom-fields-rss
+      - ./docker/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
       - ./docker/apache-hardening.conf:/etc/apache2/conf-enabled/zz-hardening.conf:ro
 
   cli:
@@ -54,6 +55,7 @@ services:
       db:
         condition: service_healthy
     environment:
+      WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
@@ -61,6 +63,7 @@ services:
     volumes:
       - wp:/var/www/html
       - ./:/var/www/html/wp-content/plugins/custom-fields-rss
+      - ./docker/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
 volumes:
   db:

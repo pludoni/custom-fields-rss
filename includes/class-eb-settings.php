@@ -21,6 +21,7 @@ class EB_Settings {
             'bms_username'      => '',
             'apply_button'      => false,
             'apply_button_text' => '',
+            'feed_fields'       => array(),
         );
         return wp_parse_args((array) get_option(self::OPTION, array()), $defaults);
     }
@@ -28,6 +29,13 @@ class EB_Settings {
     public static function get($key, $fallback = '') {
         $options = self::options();
         return isset($options[$key]) ? $options[$key] : $fallback;
+    }
+
+    /** @return array<int, array{key: string, heading: string}> */
+    public static function feed_fields() {
+        return array_values(array_filter((array) self::get('feed_fields', array()), function ($field) {
+            return is_array($field) && !empty($field['key']);
+        }));
     }
 
     public static function default_for($field) {
@@ -66,10 +74,10 @@ class EB_Settings {
                 ? $input['nummer_strategy']
                 : 'stable',
             'post_types'        => array(),
-            // Entspricht der Routen-Einschränkung im EBMS.
-            'bms_username'      => preg_replace('/[^a-z0-9._-]/', '', strtolower(trim(isset($input['bms_username']) ? (string) $input['bms_username'] : ''))),
+            'bms_username'      => self::sanitize_username(isset($input['bms_username']) ? $input['bms_username'] : ''),
             'apply_button'      => !empty($input['apply_button']),
             'apply_button_text' => sanitize_text_field(isset($input['apply_button_text']) ? $input['apply_button_text'] : ''),
+            'feed_fields'       => self::parse_feed_fields(isset($input['feed_fields']) ? $input['feed_fields'] : ''),
         );
 
         $schema = EB_Fields::all();
@@ -93,6 +101,38 @@ class EB_Settings {
         }
 
         return $clean;
+    }
+
+    /** Eine Zeile je Feld: "meta_key" oder "meta_key | Überschrift". */
+    private static function parse_feed_fields($text) {
+        if (is_array($text)) {
+            return $text;
+        }
+        $fields = array();
+        foreach (preg_split('/\R/', (string) $text) as $line) {
+            $parts = array_map('trim', explode('|', $line, 2));
+            $key   = preg_replace('/[^A-Za-z0-9_-]/', '', $parts[0]);
+            if ($key !== '') {
+                $fields[] = array('key' => $key, 'heading' => sanitize_text_field(isset($parts[1]) ? $parts[1] : ''));
+            }
+        }
+        return $fields;
+    }
+
+    /** Ungültige Eingaben verwerfen statt still zu kürzen: aus "max@firma.de" würde sonst "maxfirma.de". */
+    private static function sanitize_username($value) {
+        $value = strtolower(trim((string) $value));
+        // Entspricht der Routen-Einschränkung im EBMS.
+        if ($value === '' || preg_match('/^[a-z0-9._-]+$/', $value)) {
+            return $value;
+        }
+
+        $message = strpos($value, '@') !== false
+            ? 'Beim EBMS-Username bitte keine E-Mail-Adresse eintragen, sondern Ihren Firmennutzernamen im Empfehlungsbund (z. B. firma-gmbh). Der bisherige Wert wurde beibehalten.'
+            : 'Der EBMS-Username darf nur Buchstaben, Ziffern, Punkt, Binde- und Unterstrich enthalten. Der bisherige Wert wurde beibehalten.';
+        add_settings_error(self::OPTION, 'bms_username', $message);
+
+        return self::get('bms_username', '');
     }
 
     public static function render() {
@@ -124,6 +164,37 @@ class EB_Settings {
                     <?php endforeach; ?>
                 </fieldset>
 
+                <h2>Stellentext im Feed</h2>
+                <p class="description">
+                    Nur nötig, wenn der Stellentext nicht im normalen Beitragsinhalt steht, sondern in eigenen Feldern,
+                    die z.&nbsp;B. eine Elementor-Vorlage auf der Seite zusammensetzt. Dann enthält der Feed sonst nur einen
+                    Teil des Textes. Die hier genannten Felder werden in dieser Reihenfolge an den Stellentext im Feed angehängt.
+                </p>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><label for="eb-feed-fields">Felder</label></th>
+                        <td>
+                            <textarea class="large-text code" rows="5" id="eb-feed-fields"
+                                      name="<?php echo esc_attr(self::OPTION); ?>[feed_fields]"
+                                      placeholder="einleitung&#10;profil | Dein Profil&#10;aufgaben | Deine Aufgaben"><?php
+                                echo esc_textarea(implode("\n", array_map(function ($field) {
+                                    return $field['heading'] === '' ? $field['key'] : $field['key'] . ' | ' . $field['heading'];
+                                }, self::feed_fields())));
+                            ?></textarea>
+                            <p class="description">Ein Feldname pro Zeile, optional mit Überschrift nach einem <code>|</code>.</p>
+                            <?php $available = EB_Feed_Content::available_keys(); ?>
+                            <?php if ($available) : ?>
+                                <p class="description">
+                                    Bei Ihren Stellen gefundene Felder:
+                                    <?php echo implode(', ', array_map(function ($key) {
+                                        return '<code>' . esc_html($key) . '</code>';
+                                    }, $available)); ?>
+                                </p>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                </table>
+
                 <h2>Automatische Stellennummer</h2>
                 <p class="description">Gilt nur für Stellen, bei denen das Feld „Nummer / GUID“ leer bleibt.</p>
                 <fieldset>
@@ -142,9 +213,15 @@ class EB_Settings {
                 <h2>Bewerben-Button</h2>
                 <p class="description">
                     Verlinkt jede Stelle direkt auf ihr Bewerbungsformular im Empfehlungsbund-Bewerbermanagement (EBMS).
-                    Das EBMS erkennt die Stelle an ihrer Nummer. Neue Stellen sind dort erst nach dem nächsten Feed-Import
-                    vorhanden, bis dahin führt der Link zur Initiativbewerbung.
+                    Das EBMS erkennt die Stelle an ihrer Nummer.
                 </p>
+                <div class="notice notice-warning inline">
+                    <p>
+                        <strong>Der Bewerbungsweg funktioniert erst nach dem Import beim Empfehlungsbund.</strong>
+                        Eine neue Stelle ist im EBMS erst vorhanden, wenn der Empfehlungsbund Ihren Feed das nächste Mal
+                        importiert hat. Bis dahin führt der Link zur Initiativbewerbung statt zur Stelle.
+                    </p>
+                </div>
                 <table class="form-table" role="presentation">
                     <tr>
                         <th scope="row"><label for="eb-bms-username">EBMS-Username</label></th>
@@ -152,8 +229,14 @@ class EB_Settings {
                             <input type="text" class="regular-text" id="eb-bms-username"
                                    name="<?php echo esc_attr(self::OPTION); ?>[bms_username]"
                                    value="<?php echo esc_attr($options['bms_username']); ?>"
-                                   placeholder="firmenname">
-                            <p class="description">Ihr Username im Empfehlungsbund. Ohne Username wird kein Link ausgegeben.</p>
+                                   placeholder="firma-gmbh"
+                                   pattern="[A-Za-z0-9._\-]+"
+                                   title="Firmennutzername ohne @, z. B. firma-gmbh">
+                            <p class="description">
+                                Ihr Firmennutzername im Empfehlungsbund, z.&nbsp;B. <code>firma-gmbh</code> – keine E-Mail-Adresse.
+                                Falls Sie unsicher sind, fragen Sie Ihren Ansprechpartner beim Empfehlungsbund.
+                                Ohne Username wird kein Link ausgegeben.
+                            </p>
                         </td>
                     </tr>
                     <tr>

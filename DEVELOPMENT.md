@@ -26,6 +26,25 @@ die Fälle ab, die beim Testen erfahrungsgemäß auffallen: eine Fachkraftstelle
 unterdrücktem Homeoffice-Feld und eine Ausbildungsstelle. Alle drei liegen über der 1.000-Zeichen-Grenze,
 unterhalb derer einige Jobbörsen den Import verweigern.
 
+### Page-Builder-Szenario
+
+Viele Kundenseiten pflegen den Stellentext nicht im Beitragsinhalt, sondern in Custom Fields, die erst eine
+Page-Builder-Vorlage zusammensetzt (z.&nbsp;B. ibh.de: Elementor Pro Theme Builder + Felder). Der Feed enthält
+dann nur den Fußtext von Yoast. Das Setup bildet das mit Hello Elementor, Elementor, ACF und Yoast SEO nach,
+auch auf einer bestehenden Instanz. Unter `/feed/?post_type=jobs` liegen vier Stellen vom Typ `jobs`:
+
+| Stelle | Wo der Text steht |
+| --- | --- |
+| Projektplaner | nur in ACF-Feldern (Einleitung, Profil, Aufgaben, Wir bieten), Inhalt leer |
+| Sales Consultant | wie oben, zusätzlich ein Auszug |
+| Werkstudent | Einleitung im Inhalt, der Rest in ACF-Feldern |
+| Linux-Administrator | nur in `_elementor_data` (Elementor-Editor), Inhalt leer |
+
+Ohne Einstellung zeigen die ersten drei im Feed nur Auszug bzw. Yoast-Fußtext – genau das Kundenproblem. Mit
+`einleitung`, `profil | Dein Profil`, `aufgaben | Deine Aufgaben`, `wir_bieten | Wir bieten` unter
+„Stellentext im Feed“ ist der Text vollständig. Elementor Pro ist nicht frei verfügbar. Stattdessen setzt `docker/mu-plugins/eb-demo-jobs.php` die
+Einzelansicht aus den Feldern zusammen, außerhalb von `the_content` – wie es die Theme-Builder-Vorlage tut.
+
 ### Zugangsdaten
 
 Sie werden bei jeder Neuinstallation zufällig erzeugt und in `.dev-credentials` abgelegt (steht in
@@ -110,4 +129,9 @@ add_filter('custom_fields_rss_apply_url', function ($url, $post) {
 add_filter('custom_fields_rss_post_types', function ($types) {
     return array('job');
 });
+
+// Aus Feldern ergänzten Stellentext im Feed nachbearbeiten (siehe „Stellentext im Feed“)
+add_filter('custom_fields_rss_feed_fields_html', function ($html, $post) {
+    return $html . '<p>Standort: ' . esc_html(get_post_meta($post->ID, 'standort', true)) . '</p>';
+}, 10, 2);
 ```

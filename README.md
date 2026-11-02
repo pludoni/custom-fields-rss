@@ -88,6 +88,26 @@ Box darunter:
 </item>
 ```
 
+### Stellentext aus eigenen Feldern (Elementor, ACF & Co.)
+
+Steht der Stellentext nicht im normalen Beitragsinhalt, sondern in eigenen Feldern, die z.&nbsp;B. eine
+Elementor-Vorlage auf der Seite zusammensetzt, landet er nicht im Feed. Dort steht dann nur ein Auszug oder
+ein Satz wie „The post … appeared first on …“.
+
+Tragen Sie unter `Einstellungen → Empfehlungsbund → Stellentext im Feed` die Namen dieser Felder ein, einen
+pro Zeile, optional mit Überschrift:
+
+```text
+einleitung
+profil | Dein Profil
+aufgaben | Deine Aufgaben
+wir_bieten | Wir bieten
+```
+
+Die Felder, die bei Ihren Stellen vorkommen, werden darunter angezeigt. Das Plugin hängt sie in dieser
+Reihenfolge an den Stellentext im Feed an, in `<description>` und `<content:encoded>`. An der Pflege der
+Stellen ändert sich nichts.
+
 ## Woher ein Feldwert kommt
 
 Das ist die einzige Regel, die man kennen muss. Für jedes Feld gilt der Reihe nach:
@@ -230,6 +250,13 @@ in [DEVELOPMENT.md](DEVELOPMENT.md).
 WordPress 6.x und 7.x, PHP 7.4 bis 8.3, Block- wie klassischer Editor.
 
 ## Changelog
+
+**2.3.0**
+
+* Stellentext aus eigenen Feldern (z.&nbsp;B. ACF in einer Elementor-Vorlage) im Feed – Einstellung
+  „Stellentext im Feed“. Bei leerem Beitragsinhalt enthält die `<description>` jetzt den vollen Text.
+* EBMS-Username wird geprüft; eine E-Mail-Adresse wird abgelehnt statt still verstümmelt.
+* Deutlicherer Hinweis, dass der Bewerben-Link erst nach dem Import beim Empfehlungsbund funktioniert.
 
 **2.2.0**
 
